@@ -9,7 +9,11 @@ dependencies {
     val kotlinVersion = project.property("kotlin.version").toString()
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion")
     implementation("org.zeroturnaround:zt-exec:1.12")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${property("coroutines.version")}")
+
+    // Testing
+    testImplementation(kotlin("test"))
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>().configureEach {

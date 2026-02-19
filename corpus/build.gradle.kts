@@ -13,10 +13,10 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:${kotlinVersion}")
 
     // Json serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${property("serialization.version")}")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${property("coroutines.version")}")
 
     // Testing
     testImplementation(kotlin("test"))
