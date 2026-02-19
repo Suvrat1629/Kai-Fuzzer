@@ -17,17 +17,19 @@ class CompilerOracle : Oracle {
         "panic:",
         "segmentation fault",
         "assertion failed",
-        "Kotlin: Internal error"
-    )
+        "kotlin: internal error"
+    ).map { it.lowercase() }
 
     private var totalAnalyses = 0L
+    private var totalAnalysisTimeMs = 0L
     private var uniqueCrashes = 0
     private val classifications = mutableMapOf<String, Int>()
     private val mutex = Mutex()
 
     override suspend fun analyze(result: ExecutionResult): OracleVerdict {
-        val classification = classify(result)
-        val isCrash = isCrash(result)
+    val start = System.currentTimeMillis()
+    val classification = classify(result)
+    val isCrash = isCrash(result)
 
         val severity = when {
             classification == "COMPILER_CRASH" -> Severity.CRITICAL
@@ -38,13 +40,12 @@ class CompilerOracle : Oracle {
 
         val isInteresting = isCrash || classification.startsWith("COMPILER_")
 
+        val analysisTime = System.currentTimeMillis() - start
         mutex.withLock {
-            if (isCrash) {
-                uniqueCrashes++
-                classifications[classification] = classifications.getOrDefault(classification, 0) + 1
-            } else {
-                classifications[classification] = classifications.getOrDefault(classification, 0) + 1
-            }
+            totalAnalyses++
+            totalAnalysisTimeMs += analysisTime
+            classifications[classification] = classifications.getOrDefault(classification, 0) + 1
+            if (isCrash) uniqueCrashes++
         }
 
         return OracleVerdict(
@@ -60,9 +61,8 @@ class CompilerOracle : Oracle {
     }
 
     override suspend fun isCrash(result: ExecutionResult): Boolean {
-        return compilerCrashPatterns.any { pattern -> 
-            result.stderr.lowercase().contains(pattern)
-        } || result.exitCode != 0
+        val stderr = result.stderr.lowercase()
+        return compilerCrashPatterns.any { pattern -> stderr.contains(pattern) } || result.exitCode != 0
     }
 
     override suspend fun classify(result: ExecutionResult): String {
@@ -83,7 +83,7 @@ class CompilerOracle : Oracle {
             uniqueCrashes=uniqueCrashes,
             uniqueWarnings = classifications.getOrDefault("COMPILER_WARNING", 0),
             classifications= classifications,
-            avgAnalysisTimeMs = 0.0)
+            avgAnalysisTimeMs = if (totalAnalyses > 0) totalAnalysisTimeMs.toDouble() / totalAnalyses else 0.0)
     }
 
     override suspend fun reset() {
@@ -94,7 +94,7 @@ class CompilerOracle : Oracle {
 
     private fun extractErrorMessage(stderr: String): String {
         return stderr.lines()
-            .firstOrNull {it.contains("error") || it.contains("panic")}
+            .firstOrNull { it.lowercase().contains("error") || it.lowercase().contains("panic") }
             ?.take(200) ?: ""
     }
 

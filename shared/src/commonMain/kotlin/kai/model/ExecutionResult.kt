@@ -2,7 +2,6 @@ package kai.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.datetime.Instant
 
 
 /**
@@ -45,18 +44,16 @@ data class ExecutionResult(
      * Check if compilation failed due to user code error.
      * Different from compiler crash - this is expected behavior.
      */
-    val isCompilationError: Boolean get() = !isSuccessful
-            && stderr.contains("error:")
-            && stderr.contains("Exception")
+    val isCompilationError: Boolean get() = !isSuccessful && stderr.lowercase().contains("error")
 
     /**
      * Check if compiler crashed (internal error, assertion, etc.)
      */
     val isCompilerCrash : Boolean get() = !isSuccessful &&
-            (stderr.contains("Internal error")||
-                stderr.contains("java.lang.") ||
-                stderr.contains("kotlin.") ||
-                stderr.contains("AssertionError"))
+            (stderr.lowercase().contains("internal error")||
+                stderr.lowercase().contains("java.lang.") ||
+                stderr.lowercase().contains("kotlin.") ||
+                stderr.lowercase().contains("assertionerror"))
 
     /**
      * Check if execution timed out.

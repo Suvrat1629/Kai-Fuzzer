@@ -9,7 +9,8 @@ plugins {
 kotlin {
 //    explicitApi()
 
-    jvmToolchain(17)
+    // Align the Kotlin/Java toolchain to Java 21 for consistent compilation on modern JDKs
+    jvmToolchain(21)
 
     jvm {
         withJava()

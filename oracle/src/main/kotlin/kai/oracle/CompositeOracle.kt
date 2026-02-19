@@ -22,8 +22,8 @@ class CompositeOracle(
             )
         }
 
-        // Combine the verdicts (Severe is given higher priority )
-        val mostSevere = verdicts.maxBy { it.severity.ordinal }
+    // Combine the verdicts (Severe is given higher priority )
+    val mostSevere = verdicts.maxByOrNull { it.severity.ordinal } ?: verdicts.first()
 
         // Now Combine the classifications
         val combinedClassification = verdicts
@@ -59,7 +59,7 @@ class CompositeOracle(
             classifications = allStats.flatMap { it.classifications.entries }
                 .groupBy ( { it.key }, {it.value} )
                 .mapValues { it.value.sum() },
-            avgAnalysisTimeMs = if (allStats.isEmpty()) {
+            avgAnalysisTimeMs = if (allStats.isNotEmpty()) {
                 allStats.map { it.avgAnalysisTimeMs }.average()
             } else 0.0
         )

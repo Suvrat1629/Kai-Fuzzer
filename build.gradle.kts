@@ -16,7 +16,8 @@ allprojects {
     // Use withType<KotlinJvmCompile> to avoid breaking KMP targets like JS/Native
     tasks.withType<KotlinJvmCompile>().configureEach {
         kotlinOptions {
-            jvmTarget = "17"
+            // Align Kotlin JVM target with the JDK used by the build (JDK 21 in CI/dev machines)
+            jvmTarget = "21"
             apiVersion = "2.1"
             languageVersion = "2.1"
             freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all")
