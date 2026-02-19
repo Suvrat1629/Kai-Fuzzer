@@ -35,4 +35,13 @@ class CompositeOracleTest {
         assertEquals("A | B", verdict.classification)
         assertEquals(Severity.CRITICAL, verdict.severity)
     }
+
+    @Test
+    fun `empty oracles fallback`() = kotlinx.coroutines.runBlocking {
+        val composite = CompositeOracle(emptyList())
+        val res = ExecutionResult(FuzzInput(""), 0, "", "", 1)
+        val verdict = composite.analyze(res)
+        assertEquals("NORMAL", verdict.classification)
+        assertEquals(Severity.INFO, verdict.severity)
+    }
 }
