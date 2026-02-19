@@ -38,8 +38,8 @@ open class InMemoryCorpus : Corpus {
             ageWeight * 0.7 + generationWeight * 0.3
         }
 
-        val totalWeight = weights.sum()
-        val randomVal = Random.nextDouble(totalWeight)  // Fixed Random usage
+    val totalWeight = weights.sum()
+    val randomVal = if (totalWeight > 0.0) Random.nextDouble(0.0, totalWeight) else 0.0
         var cumulative = 0.0
 
         for ((index, weight) in weights.withIndex()) {
@@ -93,19 +93,32 @@ open class InMemoryCorpus : Corpus {
 
         dir.listFiles { f -> f.extension == "kt" }?.forEach { file ->
             val source = file.readText()
+            val fuzz = FuzzInput(sourceCode = source)
             val dummyResult = ExecutionResult(
-                input = FuzzInput(sourceCode = "dummy"),  // Named param for safety
+                input = fuzz,
                 exitCode = 0,
                 stdout = "",
                 stderr = "",
                 durationMs = 0
             )
-            add(FuzzInput(sourceCode = source), dummyResult)  // Named param
+            add(fuzz, dummyResult)
         }
         val hashesFile = File(dir, "hashes.json")
-        if (hashesFile.exists()) seenHashes.addAll(Json.decodeFromString(hashesFile.readText()))
+        if (hashesFile.exists()) {
+            try {
+                seenHashes.addAll(Json.decodeFromString(hashesFile.readText()))
+            } catch (_: Exception) {
+                // ignore malformed hashes file
+            }
+        }
         val resultsFile = File(dir, "results.json")
-        if (resultsFile.exists()) results.putAll(Json.decodeFromString(resultsFile.readText()))
+        if (resultsFile.exists()) {
+            try {
+                results.putAll(Json.decodeFromString(resultsFile.readText()))
+            } catch (_: Exception) {
+                // ignore malformed results file
+            }
+        }
     }
 
     override suspend fun prune(maxSize: Int) = mutex.withLock {

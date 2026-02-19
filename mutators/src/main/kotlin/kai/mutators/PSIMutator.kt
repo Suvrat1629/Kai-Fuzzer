@@ -206,9 +206,19 @@ class PSIMutator : Mutator {
         val function = targetFunctions.randomOrNull() ?: return fileCopy.text
         val block = function.bodyBlockExpression ?: return fileCopy.text
         val singleStmt = block.statements.firstOrNull() as? KtReturnExpression ?: return fileCopy.text
+        val returnedText = singleStmt.returnedExpression?.text ?: "Unit"
         val psiFactory = KtPsiFactory(fileCopy.project)
-        val expressionBody = psiFactory.createExpression(singleStmt.returnedExpression?.text ?: "Unit")
-        function.bodyExpression!!.replace(expressionBody)
+
+        // Safely convert the block-bodied function into an expression body by reconstructing it.
+        // Replacing the entire function with a new one avoids accessing possibly-null bodyExpression.
+        try {
+            val newFunctionText = function.text.replace(block.text, " = $returnedText")
+            val newFunction = psiFactory.createFunction(newFunctionText)
+            function.replace(newFunction)
+        } catch (e: Exception) {
+            // If reconstruction fails, return the original file text to avoid crashing the mutator.
+            return fileCopy.text
+        }
         return fileCopy.text
     }
 
