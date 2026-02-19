@@ -1,0 +1,71 @@
+# Gradle
+.gradle/
+**/build/
+!gradle/wrapper/
+
+# Gradle wrapper caches and local files
+.gradle/
+
+# Gradle output
+build/
+**/build/
+out/
+
+# Kotlin/Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Kotlin/Native and multiplatform
+.konan/
+*.klib
+*.kexe
+.cinterop/
+*.kotlin_module
+*.kotlin_metadata
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+tmp/
+temp/
+
+# Kotlin/Gradle caches
+/.gradle/
+
+# Local configuration
+local.properties
+
+# Test output
+test-results/
+
+# Coverage
+coverage/
+
+# Misc
+*.swp
+*~
+
+# Ignore generated Kotlin PSI temp files (if any)
+*.kt~
+
+# Ignore persistent temp directories created by runner
+kai_out_*/
+kai_ext_*/
+
+# Keep the gradle wrapper jar and scripts tracked; ignore other wrapper artifacts if created
+gradle/wrapper/gradle-wrapper.properties
