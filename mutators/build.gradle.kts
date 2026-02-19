@@ -16,7 +16,7 @@ dependencies {
     implementation("org.zeroturnaround:zt-exec:1.12")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${property("coroutines.version")}")
 
     // Testing
     testImplementation(kotlin("test"))

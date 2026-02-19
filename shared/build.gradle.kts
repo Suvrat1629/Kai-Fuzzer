@@ -37,7 +37,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${property("serialization.version")}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${property("coroutines.version")}")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
             }
