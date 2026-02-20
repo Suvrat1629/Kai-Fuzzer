@@ -23,6 +23,7 @@ Repository layout
 ├─ platforms/
 │  └─ jvm/     # JVM-specific runner implementation
 ├─ mutators/   # mutation strategies (PSI-based mutator)
+├─ oracle/     # oracle to detect and categorise crashes
 ├─ corpus/     # InMemoryCorpus with filesystem persistence
 ├─ oracle/     # Oracles (CompilerOracle, GenericOracle, CompositeOracle)
 ├─ build.gradle.kts
