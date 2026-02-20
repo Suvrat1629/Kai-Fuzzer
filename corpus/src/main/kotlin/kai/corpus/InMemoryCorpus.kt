@@ -80,18 +80,44 @@ open class InMemoryCorpus : Corpus {
 
     override suspend fun save(path: String) {
         val dir = File(path).apply { mkdirs() }
+        // Write inputs into a dedicated `inputs/` folder for clarity
+        val inputsDir = File(dir, "inputs").apply { mkdirs() }
         inputs.forEachIndexed { index, inp ->
-            File(dir, "input_$index.kt").writeText(inp.sourceCode)
+            File(inputsDir, "input_$index.kt").writeText(inp.sourceCode)
         }
+
+        // Persist metadata and aggregate results
         File(dir, "hashes.json").writeText(Json.encodeToString(seenHashes))
         File(dir, "results.json").writeText(Json.encodeToString(results))
+
+        // Create per-crash artifacts under `crashes/` so users can inspect reproductions
+        val crashesDir = File(dir, "crashes").apply { mkdirs() }
+        results.values.forEachIndexed { idx, res ->
+            val classification = res.classify()
+            // Treat compiler crashes, timeouts and killed processes as crash-worthy
+            if (classification.contains("CRASH") || res.isKilled || res.isTimeout) {
+                val crashSub = File(crashesDir, "crash_$idx").apply { mkdirs() }
+                File(crashSub, "input.kt").writeText(res.input.sourceCode)
+                File(crashSub, "result.json").writeText(res.toJson())
+                File(crashSub, "meta.json").writeText(Json.encodeToString(mapOf(
+                    "classification" to classification,
+                    "exitCode" to res.exitCode,
+                    "timestamp" to res.timestamp
+                )))
+            }
+        }
     }
 
     override suspend fun load(path: String) {
         val dir = File(path)
         if (!dir.exists() || !dir.isDirectory) return
 
-        dir.listFiles { f -> f.extension == "kt" }?.forEach { file ->
+        // Support both new layout (`inputs/`) and older flat layout of .kt files
+        val inputsDir = File(dir, "inputs")
+        val ktFiles = (inputsDir.takeIf { it.exists() && it.isDirectory }?.listFiles { f -> f.extension == "kt" }?.toList()
+            ?: dir.listFiles { f -> f.extension == "kt" }?.toList()) ?: emptyList()
+
+        ktFiles.forEach { file ->
             val source = file.readText()
             val fuzz = FuzzInput(sourceCode = source)
             val dummyResult = ExecutionResult(

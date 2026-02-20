@@ -67,5 +67,27 @@ coverage/
 kai_out_*/
 kai_ext_*/
 
+# Fuzzer corpus and crash artifacts
+# Default corpus dir used by app when running under Gradle (relative to app/)
+app/my_corpus/
+# Any corpus directories created in other modules or by absolute paths
+**/my_corpus/
+# Directory for saved crash artifacts
+app/crashes/
+**/crashes/
+
+# More robust ignore rules so renaming the corpus dir won't accidentally
+**/*corpus/
+**/*corpus/**
+
+# Ignore per-run artifact files created by the corpus writer
+**/input_*.kt
+**/hashes.json
+**/results.json
+
+# Also ignore directories that include 'crash' in their name
+**/*crash/
+**/*crash/**
+
 # Keep the gradle wrapper jar and scripts tracked; ignore other wrapper artifacts if created
 gradle/wrapper/gradle-wrapper.properties
