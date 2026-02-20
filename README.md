@@ -4,12 +4,13 @@ A small Kotlin multiplatform fuzzer framework for Kotlin source code. This repos
 
 ## Quick overview
 
-- `shared/` — shared interfaces and models (Engine, Corpus, Oracle, Runner, ExecutionResult).
-- `engine/` — default fuzzing engine implementation (concurrency, worker loop).
-- `platforms/jvm/` — JVM runner that compiles and/or executes Kotlin snippets.
-- `mutators/` — mutation strategies (PSI-based mutator, etc.).
-- `corpus/` — in-memory corpus implementation with filesystem persistence.
-- `app/` — small CLI/app entrypoint that wires components together.
+- `shared/` - shared interfaces and models (Engine, Corpus, Oracle, Runner, ExecutionResult).
+- `engine/` - default fuzzing engine implementation (concurrency, worker loop).
+- `platforms/jvm/` - JVM runner that compiles and/or executes Kotlin snippets.
+- `mutators/` - mutation strategies (PSI-based mutator, etc.).
+- `oracle/` - oracle is used to detect crashes and categorise them
+- `corpus/` - in-memory corpus implementation with filesystem persistence.
+- `app/` - small CLI/app entrypoint that wires components together.
 
 ## Build
 
